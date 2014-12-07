@@ -41,9 +41,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="attacks\LightningArea.cs" />
     <Compile Include="enemies\Squid.cs" />
     <Compile Include="environment\Corner.cs" />
     <Compile Include="enemies\Enemy.cs" />
+    <Compile Include="util\BretUtil.cs" />
+    <Compile Include="util\Explosion.cs" />
     <Compile Include="util\Global.cs" />
     <Compile Include="Level.cs" />
     <Compile Include="util\Light.cs" />
@@ -56,6 +59,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="assets\shaders\displacement.frag">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="assets\shaders\explosion.frag">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="assets\shaders\water_wave.frag">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -77,7 +86,19 @@
     <Content Include="assets\gfx\Coroners.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="assets\gfx\displacementMap.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\gfx\gradientMap.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="assets\gfx\lighttexture.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\gfx\paletteMap.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\gfx\shockwave.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="assets\gfx\squeed.png">

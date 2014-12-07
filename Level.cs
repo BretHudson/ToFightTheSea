@@ -15,10 +15,13 @@ namespace LD31 {
 
 		private Surface ambientLighting;
 		private Surface lightSurface;
+		private Surface darknessSurface;
 
-		private Image lightTexture = new Image("assets/gfx/lightTexture.png");
+		private Image lightTexture1 = new Image("assets/gfx/lightTexture.png");
+		private static List<Image> lightTextures = new List<Image>();
 
 		public static List<Light> lights = new List<Light>();
+		public static List<Light> darkness = new List<Light>();
 
 		public Level() {
 			// Set up background
@@ -30,8 +33,11 @@ namespace LD31 {
 
 			ambientLighting = new Surface(1920, 1080);
 			lightSurface = new Surface(1920, 1080);
+			darknessSurface = new Surface(1920, 1080);
 
-			lightTexture.CenterOrigin();
+			lightTexture1.CenterOrigin();
+
+			lightTextures.Add(lightTexture1);
 		}
 
 		public override void Begin() {
@@ -40,7 +46,11 @@ namespace LD31 {
 			// Add the player
 			Add(new Player(1920 >> 1, 1080 >> 1, Global.PlayerOne));
 
-			Add(new Squid(1100, 480));
+			var explosion = Add(new Explosion(800, 300));
+			explosion.SetAlpha(2.0f, 1.0f, 0.0f);
+			explosion.SetRadius(2.0f, 100.0f, 580.0f, 560.0f, 480.0f);
+
+			//Add(new Squid(1100, 480));
 
 			// Create the four corners
 			CreateCorners();
@@ -48,6 +58,7 @@ namespace LD31 {
 			// Add dat surface
 			Game.AddSurface(ambientLighting);
 			Game.AddSurface(lightSurface);
+			Game.AddSurface(darknessSurface);
 		}
 
 		private void CreateCorners() {
@@ -58,12 +69,39 @@ namespace LD31 {
 			var corner4 = Add(new Corner(Game.Width - (int)Corner.size.X, 0));
 
 			// Lights
-			var light1 = new Light();
+			#region Lights
+			/*var light1 = new Light();
 			light1.entity = corner1;
 			light1.SetColor(new Color("008080"));
 			light1.SetRadius(300.0f);
 			light1.SetAlpha(0.5f);
+			light1.SetOffset(30, 30);
 			lights.Add(light1);
+
+			var light2 = new Light();
+			light2.entity = corner2;
+			light2.SetColor(new Color("008080"));
+			light2.SetRadius(300.0f);
+			light2.SetAlpha(0.5f);
+			light2.SetOffset(30, -30);
+			lights.Add(light2);
+
+			var light3 = new Light();
+			light3.entity = corner3;
+			light3.SetColor(new Color("008080"));
+			light3.SetRadius(300.0f);
+			light3.SetAlpha(0.5f);
+			light3.SetOffset(-30, -30);
+			lights.Add(light3);
+
+			var light4 = new Light();
+			light4.entity = corner4;
+			light4.SetColor(new Color("008080"));
+			light4.SetRadius(300.0f);
+			light4.SetAlpha(0.5f);
+			light4.SetOffset(30, -30);
+			lights.Add(light4);*/
+			#endregion
 		}
 
 		public override void Update() {
@@ -77,6 +115,10 @@ namespace LD31 {
 			foreach (Light light in lights) {
 				light.Update(Game.RealDeltaTime * 0.001f);
 			}
+
+			foreach (Light light in darkness) {
+				light.Update(Game.RealDeltaTime * 0.001f);
+			}
 		}
 
 		public override void Render() {
@@ -87,16 +129,26 @@ namespace LD31 {
 			ambientLighting.Fill(new Color("BCBCBC"));
 			ambientLighting.Blend = BlendMode.Multiply;
 
+			darknessSurface.Fill(new Color("FFFFFF"));
+			darknessSurface.Blend = BlendMode.Multiply;
+
 			foreach (Light light in lights) {
-				lightTexture.Color = light.Color;
-				lightTexture.Alpha = light.Alpha;
-				lightTexture.Scale = light.Scale;
-				lightSurface.Draw(lightTexture, light.X, light.Y);
+				var i = light.Image;
+				lightTextures[i].Color = light.Color;
+				lightTextures[i].Alpha = light.Alpha;
+				lightTextures[i].Scale = light.Scale;
+				lightSurface.Draw(lightTextures[i], light.X, light.Y);
+			}
+
+			foreach (Light light in darkness) {
+				var i = light.Image;
+				lightTextures[i].Color = light.Color;
+				lightTextures[i].Alpha = light.Alpha;
+				lightTextures[i].Scale = light.Scale;
+				darknessSurface.Draw(lightTextures[i], light.X, light.Y);
 			}
 
 			lightSurface.Blend = BlendMode.Add;
-
-
 		}
 
 	}

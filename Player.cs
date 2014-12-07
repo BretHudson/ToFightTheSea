@@ -57,9 +57,10 @@ namespace LD31 {
 
 			light = new Light();
 			light.SetAlpha(0.7f);
-			light.SetColor(Color.Cyan, Color.Blue);
+			light.SetColor(new Color("879DFF"), new Color("62D8E0"));
 			light.SetColorSpan(5.0f);
-			light.SetRadius(sprite.Width + 30);
+			light.SetRadius(sprite.Width + 30, sprite.Width + 60);
+			light.SetRadiusSpan(5.0f);
 			light.entity = this;
 			Level.lights.Add(light);
 		}
@@ -203,13 +204,16 @@ namespace LD31 {
 		IEnumerator AreaAttack() {
 			canMove = false;
 			canAttack = false;
-			yield return Coroutine.Instance.WaitForFrames(16);
+			sprite.Play(AnimType.Attack);
+			yield return Coroutine.Instance.WaitForFrames(20);
 
 			// TODO: Burst it quick
 			canMove = true;
-			yield return Coroutine.Instance.WaitForFrames(5);
+			Scene.Add(new LightningArea(X, Y, direction));
+			yield return Coroutine.Instance.WaitForFrames(8);
 
 			canAttack = true;
+			sprite.Play(AnimType.Go);
 		}
 
 		void OrientSprite() {

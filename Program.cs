@@ -26,6 +26,16 @@ namespace LD31 {
 
 			// Get some updating goodness
 			game.OnUpdate += ToggleFullscreen;
+			game.OnUpdate += UpdateMaps;
+
+			// Set up explosion shader
+			Global.explosionShader = new Shader(ShaderType.Fragment, "assets/shaders/displacement.frag");
+			/*Global.explosionShader.SetParameter("displacementMap", Global.displacementMap.Texture);
+			Global.explosionShader.SetParameter("paletteMap", Global.paletteMap.Texture);
+			Global.explosionShader.SetParameter("gradientMap", Global.gradientMap.Texture);*/
+			game.Surface.AddShader(Global.explosionShader);
+
+			Global.shockwave.CenterOrigin();
 
 			// Start the game
 			game.Start();
@@ -40,20 +50,30 @@ namespace LD31 {
 			session.Controller.Down.AddKey(Key.Down, Key.S);
 			session.Controller.Right.AddKey(Key.Right, Key.D);
 
-			session.Controller.X.AddKey(Key.C);
+			session.Controller.Cross.AddKey(Key.C);
 			session.Controller.Square.AddKey(Key.X); // Ball
 			session.Controller.Triangle.AddKey(Key.Z); // Area attack
 			
 			return session;
 		}
 
+		static float timer = 0.0f;
+
 		static void ToggleFullscreen() {
+
+			Global.displacementMap.Scale = Util.Lerp(0.0f, 1.0f, timer);
+
 			if (game.Input.KeyPressed(Key.F)) {
 				fullscreen = !fullscreen;
 
-				if (fullscreen) game.SetWindow(1920, 1080, true, true);
+				if (fullscreen) game.SetWindow((int)Global.Resolution.X, (int)Global.Resolution.Y, true, true);
 				else game.SetWindow(960, 540, false, false);
 			}
+		}
+
+		static void UpdateMaps() {
+			Global.explosionShader.SetParameter("displacementMap", Global.shaderSurface.Texture);
+			Global.shaderSurface.Fill(new Color(0.5f, 0.5f, 0.5f, 1.0f));
 		}
 
 	}

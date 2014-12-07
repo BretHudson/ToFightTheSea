@@ -13,11 +13,24 @@ namespace LD31 {
 		private float cooldownTimer;
 		private bool hurt = false;
 
+		protected Vector2 acceleration = Vector2.Zero;
+		protected Vector2 velocity = Vector2.Zero;
+		protected float maxspeed = 5.0f;
+		
+		protected Vector2 direction = new Vector2(0, 1);
+		private float angle;
+		protected float dirStepAmount = 5.0f;
+
 		protected Light light;
 
 		public Enemy(float x, float y, int health, float cooldown) : base(x, y) {
 			this.health = health;
 			cooldownTimer = cooldown;
+		}
+
+		public override void Update() {
+			X += velocity.X;
+			Y += velocity.Y;
 		}
 
 		public void Kill() {
@@ -69,6 +82,18 @@ namespace LD31 {
 			} else if (Y > bottom) {
 				Y = top;
 			}
+		}
+
+		protected float OrientCircularSprite() {
+			if ((Math.Abs(acceleration.X) > 0.0f) || (Math.Abs(acceleration.Y) > 0.0f)) {
+				var newAngle = Util.RAD_TO_DEG * (float)Math.Atan2(-acceleration.Y, acceleration.X);
+				var angleDiff = ((((newAngle - angle) % 360) + 540) % 360) - 180;
+				var rotateAmount = Util.Clamp(angleDiff, -dirStepAmount, dirStepAmount);
+				direction = Util.Rotate(direction, rotateAmount);
+				angle = (float)Math.Atan2(-direction.Y, direction.X) * Util.RAD_TO_DEG;
+			}
+
+			return angle;
 		}
 
 	}

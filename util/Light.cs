@@ -1,5 +1,6 @@
 ﻿using Otter;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,9 +11,9 @@ namespace LD31 {
 
 		private const float ratio = 1.0f / 1024.0f;
 
-		private float startAlpha, endAlpha;
-		private Color startColor, endColor;
-		private float startRadius, endRadius;
+		private float[] alpha = { 1.0f };
+		private Color[] color = { Color.White };
+		private float[] radius = { 512.0f };
 
 		private float alphaElapsed, alphaTime = 1.0f;
 		private bool alphaFlipped = false;
@@ -24,16 +25,44 @@ namespace LD31 {
 		public Entity entity;
 		private Vector2 offset;
 
+		private int image;
+
+		private float fadeInOutTimer = 0.0f;
+		private float fadeIn;
+
 		public float Alpha {
-			get { return Util.Lerp(startAlpha, endAlpha, alphaElapsed / alphaTime); }
+			get {
+				if (alpha.Length == 1) return alpha[0];
+				var amount = fadeInOutTimer / fadeIn;
+				if ((amount == 1) || (fadeIn == 0)) {
+					return Util.LerpSet(alphaElapsed / alphaTime, alpha);
+				} else {
+					return Util.Lerp(0.0f, Util.LerpSet(alphaElapsed / alphaTime, alpha), amount);
+				}
+			}
 		}
 
 		public Color Color {
-			get { return Util.LerpColor(startColor, endColor, colorElapsed / colorTime); }
+			get {
+				if (color.Length == 1) return color[0]; 
+				return BretUtil.LerpColorSet(colorElapsed / colorTime, color);
+			}
+		}
+
+		public int Image {
+			get { return image; }
 		}
 
 		public float Radius {
-			get { return Util.Lerp(startRadius, endRadius, radiusElapsed / radiusTime); }
+			get {
+				if (radius.Length == 1) return radius[0];
+				var amount = fadeInOutTimer / fadeIn;
+				if ((amount == 1) || (fadeIn == 0)) {
+					return Util.LerpSet(radiusElapsed / radiusTime, radius);
+				} else {
+					return Util.Lerp(0.0f, Util.LerpSet(radiusElapsed / radiusTime, radius), amount);
+				}
+			}
 		}
 
 		public float Scale {
@@ -41,17 +70,44 @@ namespace LD31 {
 		}
 
 		public float X {
-			get { return entity.X; }
+			get { return entity.X - offset.X; }
 		}
 
 		public float Y {
-			get { return entity.Y; }
+			get { return entity.Y - offset.Y; }
 		}
 
-		public Light() {
-			startAlpha = endAlpha = 1.0f;
-			startColor = endColor = Color.White;
-			startRadius = endRadius = 512.0f;
+		public Light(int image = 0, float fadeIn = 0f) {
+			this.image = image;
+			FadeIn(fadeIn);
+		}
+
+		public void FadeIn(float fadeIn) {
+			Game.Instance.Coroutine.Start(FadeInCoroutine(fadeIn));
+		}
+
+		IEnumerator FadeInCoroutine(float fadeIn) {
+			this.fadeIn = fadeIn;
+			fadeInOutTimer = 0;
+			while (fadeInOutTimer < fadeIn) {
+				fadeInOutTimer += Game.Instance.RealDeltaTime * 0.001f;
+				yield return 0;
+			}
+			fadeInOutTimer = fadeIn;
+		}
+
+		public void FadeOut(float fadeOut) {
+			Game.Instance.Coroutine.Start(FadeOutCoroutine(fadeOut));
+		}
+
+		IEnumerator FadeOutCoroutine(float fadeOut) {
+			fadeInOutTimer = fadeOut;
+			fadeIn = fadeOut;
+			while (fadeInOutTimer > 0) {
+				fadeInOutTimer -= Game.Instance.RealDeltaTime * 0.001f;
+				yield return 0;
+			}
+			fadeInOutTimer = 0;
 		}
 
 		public void Update(float deltaTime) {
@@ -76,39 +132,24 @@ namespace LD31 {
 			return amount;
 		}
 
-		public void SetAlpha(float alpha) {
-			SetAlpha(alpha, alpha);
-		}
-
-		public void SetAlpha(float alpha1, float alpha2) {
-			startAlpha = alpha1;
-			endAlpha = alpha2;
+		public void SetAlpha(params float[] alpha) {
+			this.alpha = alpha;
 		}
 
 		public void SetAlphaSpan(float time) {
 			alphaTime = time;
 		}
 
-		public void SetColor(Color color) {
-			SetColor(color, color);
-		}
-
-		public void SetColor(Color color1, Color color2) {
-			startColor = color1;
-			endColor = color2;
+		public void SetColor(params Color[] color) {
+			this.color = color;
 		}
 
 		public void SetColorSpan(float time) {
 			colorTime = time;
 		}
 
-		public void SetRadius(float radius) {
-			SetRadius(radius, radius);
-		}
-
-		public void SetRadius(float radius1, float radius2) {
-			startRadius = radius1;
-			endRadius = radius2;
+		public void SetRadius(params float[] radius) {
+			this.radius = radius;
 		}
 
 		public void SetRadiusSpan(float time) {

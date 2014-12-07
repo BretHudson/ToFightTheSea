@@ -13,12 +13,14 @@ namespace LD31 {
 		private float lifespan;
 		private bool destroyed = false;
 
-		public Projectile(float x, float y, Vector2 direction, float speed, Vector2 size, float lifespan, params int[] tags) : base(x, y) {
+		protected Light light = null;
+
+		public Projectile(float x, float y, Vector2 direction, float speed, int radius, float lifespan, params int[] tags) : base(x, y) {
 			direction.Normalize();
 			this.velocity = direction * speed;
 			this.lifespan = lifespan;
-			SetHitbox((int)size.X, (int)size.Y, tags);
-			Hitbox.CenterOrigin();
+			Collider = new CircleCollider(radius, tags);
+			Collider.CenterOrigin();
 		}
 
 		public override void Added() {
@@ -44,6 +46,11 @@ namespace LD31 {
 			Wrap();
 		}
 
+		/*public override void Render() {
+			base.Render();
+			Collider.Render();
+		}*/
+
 		IEnumerator Destroy() {
 			if (!destroyed) {
 				SetHitbox(0, 0, (int)Tags.PROJECTILE);
@@ -51,6 +58,11 @@ namespace LD31 {
 			}
 
 			yield return Explosion();
+
+			if (light != null) {
+				Level.lights.Remove(light);
+				light = null;
+			}
 
 			RemoveSelf();
 		}
@@ -60,11 +72,11 @@ namespace LD31 {
 		}
 
 		void Wrap() {
-			var left = 0 - ((int)Hitbox.Width >> 1);
-			var right = 1920 + ((int)Hitbox.Width >> 1);
+			var left = 0 - ((int)Collider.Width >> 1);
+			var right = 1920 + ((int)Collider.Width >> 1);
 
-			var top = 0 - ((int)Hitbox.Height >> 1);
-			var bottom = 1080 + ((int)Hitbox.Height >> 1);
+			var top = 0 - ((int)Collider.Height >> 1);
+			var bottom = 1080 + ((int)Collider.Height >> 1);
 
 			if (X < left) {
 				X = right;
