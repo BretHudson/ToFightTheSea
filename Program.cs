@@ -30,12 +30,10 @@ namespace LD31 {
 
 			// Set up explosion shader
 			Global.explosionShader = new Shader(ShaderType.Fragment, "assets/shaders/displacement.frag");
-			/*Global.explosionShader.SetParameter("displacementMap", Global.displacementMap.Texture);
-			Global.explosionShader.SetParameter("paletteMap", Global.paletteMap.Texture);
-			Global.explosionShader.SetParameter("gradientMap", Global.gradientMap.Texture);*/
 			game.Surface.AddShader(Global.explosionShader);
-
 			Global.shockwave.CenterOrigin();
+
+			
 
 			// Start the game
 			game.Start();

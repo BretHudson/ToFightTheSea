@@ -35,7 +35,7 @@ namespace LD31 {
 		}
 
 		public Explosion(float x, float y) : base(x, y) {
-			//
+			
 		}
 
 		public override void Update() {

@@ -32,8 +32,8 @@ namespace LD31 {
 
 		public float Alpha {
 			get {
-				if (alpha.Length == 1) return alpha[0];
 				var amount = fadeInOutTimer / fadeIn;
+				if (alpha.Length == 1) return ((fadeIn == 0) ? alpha[0] : Util.Lerp(0.0f, alpha[0], amount));
 				if ((amount == 1) || (fadeIn == 0)) {
 					return Util.LerpSet(alphaElapsed / alphaTime, alpha);
 				} else {
@@ -55,8 +55,8 @@ namespace LD31 {
 
 		public float Radius {
 			get {
-				if (radius.Length == 1) return radius[0];
 				var amount = fadeInOutTimer / fadeIn;
+				if (radius.Length == 1) return ((fadeIn == 0) ? radius[0] : Util.Lerp(0.0f, radius[0], amount));
 				if ((amount == 1) || (fadeIn == 0)) {
 					return Util.LerpSet(radiusElapsed / radiusTime, radius);
 				} else {

@@ -46,11 +46,11 @@ namespace LD31 {
 			// Add the player
 			Add(new Player(1920 >> 1, 1080 >> 1, Global.PlayerOne));
 
-			var explosion = Add(new Explosion(800, 300));
+			var explosion = Add(new Explosion(1920 >> 1, 1080 >> 1));
 			explosion.SetAlpha(2.0f, 1.0f, 0.0f);
 			explosion.SetRadius(2.0f, 100.0f, 580.0f, 560.0f, 480.0f);
 
-			//Add(new Squid(1100, 480));
+			Add(new Squid(1100, 480));
 
 			// Create the four corners
 			CreateCorners();
@@ -59,6 +59,10 @@ namespace LD31 {
 			Game.AddSurface(ambientLighting);
 			Game.AddSurface(lightSurface);
 			Game.AddSurface(darknessSurface);
+
+			// Start the music
+			Global.gameMusic.Loop = true;
+			Global.gameMusic.Play();
 		}
 
 		private void CreateCorners() {
