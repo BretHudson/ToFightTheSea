@@ -1,0 +1,229 @@
+﻿using Otter;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace LD31 {
+	class Player : Entity {
+
+		private Image sprite = new Image("assets/gfx/tentacool.png");
+
+		private float angle = 90;
+		private Vector2 direction = new Vector2(0, -1);
+		private Vector2 lastInput = new Vector2(0, -1);
+		private float dirStepAmount = 5.0f;
+
+		private Vector2 acceleration;
+		private Vector2 velocity;
+		private float lastX, lastY;
+
+		private float maxspeed = 9.0f;
+		private float aspeed = 0.46f;
+		private float friction = 0.30f;
+		private Session session;
+
+		private float minBounce = 2.0f;
+
+		private bool canAttack = true;
+		private bool canMove = true;
+
+		public Player(float x, float y, Session session) : base(x, y) {
+			// Assign session
+			this.session = session;
+			
+			// Set up hitboxes
+			SetHitbox(sprite.Width - 24, sprite.Height - 24, (int)Tags.PLAYER);
+			Hitbox.CenterOrigin();
+
+			// Sprite stuff
+			sprite.CenterOrigin();
+			Graphic = sprite;
+
+			// TODO: Move this to scene and have the scene deal with these kind of issues
+			// Or, perhaps create a parent class that deals with wrappable-entities
+			// Set up game bounds
+			Layer = -1;
+		}
+
+		public override void Update() {
+			// Reset variables
+			acceleration = Vector2.Zero;
+
+			// Get player input
+			Vector2 inputDir;
+			inputDir.X = Convert.ToInt32(session.Controller.Right.Down) - Convert.ToInt32(session.Controller.Left.Down);
+			inputDir.Y = Convert.ToInt32(session.Controller.Down.Down) - Convert.ToInt32(session.Controller.Up.Down);
+
+			if (!canMove)
+				inputDir = Vector2.Zero;
+
+			if (inputDir == Vector2.Zero) {
+				// Make it slow down as an overall speed rather than each axis
+				var length = velocity.Length;
+				length = Math.Max(0, length - friction);
+				velocity.Normalize();
+				velocity *= length;
+			} else {
+				// Accelerate
+				if (inputDir.X != 0) {
+					acceleration.X = inputDir.X * aspeed;
+					velocity.X += acceleration.X;
+					velocity.X = Util.Clamp(velocity.X, -maxspeed, maxspeed);
+				} else {
+					velocity.X = Util.Approach(velocity.X, 0, friction);
+				}
+
+				if (inputDir.Y != 0) {
+					acceleration.Y = inputDir.Y * aspeed;
+					velocity.Y += acceleration.Y;
+					velocity.Y = Util.Clamp(velocity.Y, -maxspeed, maxspeed);
+				} else {
+					velocity.Y = Util.Approach(velocity.Y, 0, friction);
+				}
+			}
+
+			// Move object
+			X += velocity.X;
+			Y += velocity.Y;
+
+			if (velocity.Length > maxspeed) {
+				velocity.Normalize();
+				velocity *= maxspeed;
+			}
+			
+			// Check to see if inside of object
+			var c = Collide(X, Y, (int)Tags.SOLID);
+			if (c != null) {
+				for (int i = 0; i < Math.Max(velocity.X, velocity.Y); ++i) {
+					// X collision
+					if (!Overlap(X - i * Math.Sign(velocity.X), Y, c.Entity)) {
+						X -= i * Math.Sign(velocity.X);
+						velocity.X *= -0.9f;
+						acceleration.X = Math.Sign(velocity.X);
+						if (Math.Abs(velocity.X) < minBounce) {
+							velocity.X = minBounce * Math.Sign(velocity.X);
+						}
+						break;
+					}
+
+					// Y collision
+					if (!Overlap(X, Y - i * Math.Sign(velocity.Y), c.Entity)) {
+						Y -= i * Math.Sign(velocity.Y);
+						velocity.Y *= -0.9f;
+						acceleration.Y = Math.Sign(velocity.Y);
+						if (Math.Abs(velocity.Y) < minBounce) {
+							velocity.Y = minBounce * Math.Sign(velocity.Y);
+						}
+						break;
+					}
+				}
+
+				if (Overlap(X, Y, c.Entity)) {
+					if (!Overlap(lastX, Y, c.Entity)) {
+						if (lastX < X) {
+							X = c.Left - Hitbox.HalfWidth;
+						} else {
+							X = c.Right + Hitbox.HalfWidth;
+						}
+						velocity.X = 0;
+					}
+					else if (!Overlap(X, lastY, c.Entity)) {
+						if (lastY < Y) {
+							Y = c.Top - Hitbox.HalfHeight;
+						} else {
+							Y = c.Bottom + Hitbox.HalfHeight;
+						}
+						velocity.Y = 0;
+					}
+				}
+			}
+
+			Attack();
+
+			// Get that sprite moving
+			OrientSprite();
+
+			// Reset last X/Y
+			lastX = X;
+			lastY = Y;
+
+			Wrap();
+		}
+
+		void Attack() {
+			if (canAttack) {
+				var shootBall = session.Controller.Square.Pressed;
+				var areaAttack = session.Controller.Triangle.Pressed;
+
+				if (shootBall) {
+					Game.Coroutine.Start(ShootBall());
+				} else if (areaAttack) {
+					Game.Coroutine.Start(AreaAttack());
+				}
+			}
+		}
+
+		IEnumerator ShootBall() {
+			// Disable shooting
+			canAttack = false;
+			yield return Coroutine.Instance.WaitForFrames(7);
+
+			// Shoot and shake screen
+			Vector2 offset = new Vector2(12, 0);
+			offset = Util.Rotate(offset, angle);
+			Scene.Add(new LightningBall(X + offset.X, Y + offset.Y, direction));
+			Screenshaker.InitShake(10, 6);
+			yield return Coroutine.Instance.WaitForFrames(12);
+
+			// Reenable shooting
+			canAttack = true;
+		}
+
+		IEnumerator AreaAttack() {
+			canMove = false;
+			canAttack = false;
+			yield return Coroutine.Instance.WaitForFrames(16);
+
+			// TODO: Burst it quick
+			canMove = true;
+			yield return Coroutine.Instance.WaitForFrames(5);
+
+			canAttack = true;
+		}
+
+		void OrientSprite() {
+			if ((Math.Abs(acceleration.X) > 0.0f) || (Math.Abs(acceleration.Y) > 0.0f)) {
+				var newAngle = Util.RAD_TO_DEG * (float)Math.Atan2(-acceleration.Y, acceleration.X);
+				var angleDiff = ((((newAngle - angle) % 360) + 540) % 360) - 180;
+				var rotateAmount = Util.Clamp(angleDiff, -dirStepAmount, dirStepAmount);
+				direction = Util.Rotate(direction, rotateAmount);
+				angle = (float)Math.Atan2(-direction.Y, direction.X) * Util.RAD_TO_DEG;
+			}
+			sprite.Angle = angle;
+		}
+
+		void Wrap() {
+			var left = 0 - ((int)Hitbox.Width >> 1);
+			var right = 1920 + ((int)Hitbox.Width >> 1);
+
+			var top = 0 - ((int)Hitbox.Height >> 1);
+			var bottom = 1080 + ((int)Hitbox.Height >> 1);
+
+			if (X < left) {
+				X = right;
+			} else if (X > right) {
+				X = left;
+			}
+
+			if (Y < top) {
+				Y = bottom;
+			} else if (Y > bottom) {
+				Y = top;
+			}
+		}
+
+	}
+}
