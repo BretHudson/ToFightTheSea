@@ -41,19 +41,24 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Corner.cs" />
-    <Compile Include="Enemy.cs" />
-    <Compile Include="Global.cs" />
+    <Compile Include="enemies\Squid.cs" />
+    <Compile Include="environment\Corner.cs" />
+    <Compile Include="enemies\Enemy.cs" />
+    <Compile Include="util\Global.cs" />
     <Compile Include="Level.cs" />
-    <Compile Include="LightningBall.cs" />
+    <Compile Include="util\Light.cs" />
+    <Compile Include="attacks\LightningBall.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="Projectile.cs" />
+    <Compile Include="attacks\Projectile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Screenshaker.cs" />
+    <Compile Include="util\Screenshaker.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="assets\shaders\water_wave.frag">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\Visual Studio 2012\Projects\otter\Otter\Otter.csproj">
@@ -70,6 +75,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="assets\gfx\Coroners.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\gfx\lighttexture.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\gfx\squeed.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="assets\gfx\tentacool.png">

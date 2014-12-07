@@ -13,6 +13,8 @@ namespace LD31 {
 		private float cooldownTimer;
 		private bool hurt = false;
 
+		protected Light light;
+
 		public Enemy(float x, float y, int health, float cooldown) : base(x, y) {
 			this.health = health;
 			cooldownTimer = cooldown;
@@ -47,6 +49,26 @@ namespace LD31 {
 			SetHitbox(0, 0, -1);
 			yield return Death();
 			RemoveSelf();
+		}
+
+		void Wrap() {
+			var left = 0 - ((int)Hitbox.Width >> 1);
+			var right = 1920 + ((int)Hitbox.Width >> 1);
+
+			var top = 0 - ((int)Hitbox.Height >> 1);
+			var bottom = 1080 + ((int)Hitbox.Height >> 1);
+
+			if (X < left) {
+				X = right;
+			} else if (X > right) {
+				X = left;
+			}
+
+			if (Y < top) {
+				Y = bottom;
+			} else if (Y > bottom) {
+				Y = top;
+			}
 		}
 
 	}

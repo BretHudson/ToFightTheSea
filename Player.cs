@@ -9,7 +9,11 @@ using System.Threading.Tasks;
 namespace LD31 {
 	class Player : Entity {
 
-		private Image sprite = new Image("assets/gfx/tentacool.png");
+		enum AnimType {
+			Go, Attack
+		}
+
+		private Spritemap<AnimType> sprite = new Spritemap<AnimType>("assets/gfx/tentacool.png", 70, 87);
 
 		private float angle = 90;
 		private Vector2 direction = new Vector2(0, -1);
@@ -30,9 +34,16 @@ namespace LD31 {
 		private bool canAttack = true;
 		private bool canMove = true;
 
+		private Light light;
+
 		public Player(float x, float y, Session session) : base(x, y) {
 			// Assign session
 			this.session = session;
+
+			// Set up animations
+			sprite.Add(AnimType.Go, new Anim(new int[] { 0, 1, 2, 3, 4, }, new float[] { 5.0f }));
+			sprite.Add(AnimType.Attack, new Anim(new int[] { 7, 8, 9, 10, 11, 12, 13 }, new float[] { 4.0f }));
+			sprite.Play(AnimType.Go);
 			
 			// Set up hitboxes
 			SetHitbox(sprite.Width - 24, sprite.Height - 24, (int)Tags.PLAYER);
@@ -42,10 +53,15 @@ namespace LD31 {
 			sprite.CenterOrigin();
 			Graphic = sprite;
 
-			// TODO: Move this to scene and have the scene deal with these kind of issues
-			// Or, perhaps create a parent class that deals with wrappable-entities
-			// Set up game bounds
 			Layer = -1;
+
+			light = new Light();
+			light.SetAlpha(0.7f);
+			light.SetColor(Color.Cyan, Color.Blue);
+			light.SetColorSpan(5.0f);
+			light.SetRadius(sprite.Width + 30);
+			light.entity = this;
+			Level.lights.Add(light);
 		}
 
 		public override void Update() {
@@ -169,17 +185,19 @@ namespace LD31 {
 		IEnumerator ShootBall() {
 			// Disable shooting
 			canAttack = false;
-			yield return Coroutine.Instance.WaitForFrames(7);
+			sprite.Play(AnimType.Attack);
+			yield return Coroutine.Instance.WaitForFrames(20);
 
 			// Shoot and shake screen
 			Vector2 offset = new Vector2(12, 0);
 			offset = Util.Rotate(offset, angle);
 			Scene.Add(new LightningBall(X + offset.X, Y + offset.Y, direction));
-			Screenshaker.InitShake(10, 6);
-			yield return Coroutine.Instance.WaitForFrames(12);
+			//Screenshaker.InitShake(10, 6);
+			yield return Coroutine.Instance.WaitForFrames(8);
 
 			// Reenable shooting
 			canAttack = true;
+			sprite.Play(AnimType.Go);
 		}
 
 		IEnumerator AreaAttack() {
@@ -202,7 +220,7 @@ namespace LD31 {
 				direction = Util.Rotate(direction, rotateAmount);
 				angle = (float)Math.Atan2(-direction.Y, direction.X) * Util.RAD_TO_DEG;
 			}
-			sprite.Angle = angle;
+			sprite.Angle = angle - 90;
 		}
 
 		void Wrap() {

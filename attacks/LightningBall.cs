@@ -11,7 +11,7 @@ namespace LD31 {
 
 		private Image sprite = Image.CreateCircle(10, Color.FromHSV(0.166f, 0.40f, 1.0f, 1.0f));
 
-		public LightningBall(float x, float y, Vector2 direction) : base(x, y, direction, 12.0f, new Vector2(20, 20), 1.3f, (int)Tags.PROJECTILE, (int)Tags.PLAYERATTACK) {
+		public LightningBall(float x, float y, Vector2 direction) : base(x, y, direction, 15.0f, new Vector2(20, 20), 1.3f, (int)Tags.PROJECTILE, (int)Tags.PLAYERATTACK) {
 			sprite.CenterOrigin();
 			Graphic = sprite;
 		}
