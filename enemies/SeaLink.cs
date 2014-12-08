@@ -62,6 +62,11 @@ namespace LD31 {
 				child = Scene.Add(new SeaLink(X, Y, babies - 1, velocity * (spaceAmount / 2)));
 				child.head = this;
 				child.target = this;
+				EnemySpawner.Instance.AddEnemy(child);
+			} else {
+				var explosion = Scene.Add(new Explosion(X, Y));
+				explosion.SetAlpha(3.0f, 0.5f, 1.0f, 0.8f, 0.5f);
+				explosion.SetRadius(3.0f, 20.0f, 100.0f);
 			}
 
 			while (sprite.ScaleX < 1.0f) {

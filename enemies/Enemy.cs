@@ -22,6 +22,8 @@ namespace LD31 {
 		private float angle;
 		protected float dirStepAmount = 5.0f;
 
+		private LineCollider solidChecker;
+
 		public Entity target;
 
 		protected Light light;
@@ -29,6 +31,9 @@ namespace LD31 {
 		public Enemy(float x, float y, int health, float cooldown) : base(x, y) {
 			this.health = health;
 			cooldownTimer = cooldown;
+
+			solidChecker = new LineCollider(0, 0, 0, 0, -1);
+			AddCollider(solidChecker);
 		}
 
 		public override void Update() {
@@ -41,6 +46,19 @@ namespace LD31 {
 				velocity *= magnitude;
 			}
 
+			if (target != null) {
+				var targetPos = GetTargetPos();
+				solidChecker.X = X;
+				solidChecker.Y = Y;
+				solidChecker.X2 = targetPos.X;
+				solidChecker.Y2 = targetPos.Y;
+				var solid = solidChecker.Collide(X, Y, (int)Tags.SOLID);
+				if (solid != null) {
+					// TODO: Get this to work
+					Console.WriteLine("LINE");
+				}
+			}
+
 			X += velocity.X;
 			Y += velocity.Y;
 
@@ -48,6 +66,12 @@ namespace LD31 {
 			Wrap();
 			if (health > 0)
 				CheckCollisions();
+		}
+
+		public override void Render() {
+			base.Render();
+
+			solidChecker.Render();
 		}
 
 		public void Kill() {
@@ -129,8 +153,6 @@ namespace LD31 {
 		}
 
 		protected float OrientCircularSprite() {
-			Console.WriteLine(acceleration);
-
 			if ((Math.Abs(acceleration.X) > 0.0f) || (Math.Abs(acceleration.Y) > 0.0f)) {
 				var newAngle = Util.RAD_TO_DEG * (float)Math.Atan2(-acceleration.Y, acceleration.X);
 				var angleDiff = ((((newAngle - angle) % 360) + 540) % 360) - 180;

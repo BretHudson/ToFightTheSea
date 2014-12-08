@@ -16,8 +16,7 @@ namespace LD31 {
 
 		public static Image shockwave = new Image("assets/gfx/shockwave.png");
 
-		public static Music gameMusic = new Music("assets/sfx/Where The Light Fades.wav", true);
-		public static Music bossMusic = new Music("assets/sfx/To Fight The Sea.wav", true);
+		public static MusicManager musicManager = new MusicManager();
 	}
 
 	public enum Tags {

@@ -1,5 +1,6 @@
 ﻿using Otter;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -25,10 +26,6 @@ namespace LD31 {
 
 		public static Player player;
 
-		public enum Musics {
-			GAME, BOSS
-		}
-
 		public Level() {
 			// Set up background
 			AddGraphic(background);
@@ -50,14 +47,11 @@ namespace LD31 {
 			base.Begin();
 
 			// Add the player
-			//player = Add(new Player(1920 >> 1, 1080 >> 1, Global.PlayerOne));
-			player = Add(new Player(400, 1080 >> 1, Global.PlayerOne));
+			player = Add(new Player(1920 >> 1, 1080 >> 1, Global.PlayerOne));
 
 			var explosion = Add(new Explosion(1920 >> 1, 1080 >> 1));
 			explosion.SetAlpha(2.0f, 1.0f, 0.0f);
 			explosion.SetRadius(2.0f, 100.0f, 580.0f, 560.0f, 480.0f);
-
-			Add(new FlyingGurnard(player));
 
 			var seaLink = Add(new SeaLink(500, 500, 16, Vector2.Zero));
 			seaLink.target = player;
@@ -72,32 +66,6 @@ namespace LD31 {
 			Game.AddSurface(ambientLighting);
 			Game.AddSurface(lightSurface);
 			Game.AddSurface(darknessSurface);
-
-			// Start the music
-#if DEBUG
-			Music.GlobalVolume = 0;
-			PlayTrack(Musics.BOSS);
-#else
-			PlayTrack(Musics.GAME);
-#endif
-		}
-
-		public static void PlayTrack(Musics music) {
-			Music track = null;
-			switch (music) {
-				case Musics.GAME:
-					track = Global.gameMusic;
-					break;
-				case Musics.BOSS:
-					track = Global.bossMusic;
-					break;
-				default:
-					track = null;
-					break;
-			}
-
-			track.Loop = true;
-			track.Play();
 		}
 
 		private void CreateCorners() {
@@ -188,6 +156,24 @@ namespace LD31 {
 			}
 
 			lightSurface.Blend = BlendMode.Add;
+		}
+
+		public void Victory() {
+			Game.Coroutine.Start(VictoryCoroutine());
+		}
+
+		IEnumerator VictoryCoroutine() {
+			Game.RemoveScene();
+			yield return 0;
+		}
+
+		public void GameOver() {
+			Game.Coroutine.Start(GameOverCoroutine());
+		}
+
+		IEnumerator GameOverCoroutine() {
+			Game.RemoveScene();
+			yield return 0;
 		}
 
 	}

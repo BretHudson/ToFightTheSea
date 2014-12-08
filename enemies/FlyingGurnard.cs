@@ -1,5 +1,6 @@
 ﻿using Otter;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,11 +9,13 @@ using System.Threading.Tasks;
 namespace LD31 {
 	class FlyingGurnard : Enemy {
 
-		enum AnimType {
-			Idle
+		enum State {
+			Idle, Swim,
 		}
 
-		private Spritemap<AnimType> sprite = new Spritemap<AnimType>("assets/gfx/wingwang.png", 425, 696);
+		private State curState = State.Idle;
+
+		private Image sprite = new Image("assets/gfx/wingwang.png");
 		private float floatDirection = -1;
 		private float floatVelocity = -1;
 		private Range floatSpeed = new Range(0.35f, 0.6f);
@@ -25,6 +28,8 @@ namespace LD31 {
 
 		private Light eye1, eye2;
 		private Vector2 eye1offset, eye2offset;
+
+		private Light softlight1, softlight2;
 		
 		private Vector2 hitboxOffset = new Vector2(-40, 0);
 		private Vector2 softSpot1Offset = new Vector2(30, 130);
@@ -37,15 +42,13 @@ namespace LD31 {
 
 		public FlyingGurnard(Entity target) : base(960, 540, 100, 10.0f) {
 			// Initialize sprite
-			sprite.Add(AnimType.Idle, new Anim(new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 }, new float[] { 4.0f }));
-			//sprite.Play(AnimType.Idle);
 			sprite.CenterOrigin();
 			Graphic = sprite;
 
 			// Set the target
 			this.target = target;
 
-			// Set up hitbox
+			// Set up hitbox (actually realized with the repel collider this hitbox is useless)
 			SetHitbox(200, 200, -1);
 			Hitbox.CenterOrigin();
 			Hitbox.OriginX += hitboxOffset.X;
@@ -66,6 +69,22 @@ namespace LD31 {
 
 			AddColliders(softSpot1, softSpot2);
 
+			softlight1 = new Light();
+			softlight1.SetAlpha(0.0f);
+			softlight1.SetColor(new Color("C42679"));
+			softlight1.SetRadius(300.0f);
+			softlight1.SetOffset(softSpot1Offset);
+			softlight1.entity = this;
+			Level.lights.Add(softlight1);
+
+			softlight2 = new Light();
+			softlight2.SetAlpha(0.0f);
+			softlight2.SetColor(new Color("C42679"));
+			softlight2.SetRadius(300.0f);
+			softlight2.SetOffset(softSpot2Offset);
+			softlight2.entity = this;
+			Level.lights.Add(softlight2);
+
 			// Lights
 			eye1 = new Light();
 			eye1.SetAlpha(0.6f);
@@ -85,47 +104,38 @@ namespace LD31 {
 			
 			// Reset direction to right
 			direction = new Vector2(0, 1);
+
+			// Set max speed
+			maxspeed = 30.0f;
 		}
 
 		public override void Render() {
 			base.Render();
 
-			for (int i = 0; i < Colliders.Count; ++i) {
+			/*for (int i = 0; i < Colliders.Count; ++i) {
 				Colliders[i].Render();
-			}
+			}*/
 		}
 
 		public override void Update() {
-			// Float
-			Y += Rand.Float(floatSpeed) * floatVelocity;
-			floatVelocity = Util.Lerp(floatVelocity, floatDirection, 0.01f);
-			var difference = Y - 540;
-			if (Math.Abs(difference) > maxDistance) {
-				if (Math.Sign(difference) == floatDirection) {
-					floatDirection *= -1;
-				}
-			}
-
+			// Scale breath
 			sprite.ScaleY += Rand.Float(scaleSpeed) * scaleVelocity;
-			scaleVelocity = Util.Lerp(scaleVelocity, scaleDirection, 0.1f);
-			difference = sprite.ScaleY - (1 - maxScaleDistance);
+			scaleVelocity = Util.Lerp(scaleVelocity, scaleDirection, 0.05f);
+			var difference = sprite.ScaleY - (1 - maxScaleDistance);
 			if (Math.Abs(difference) > maxScaleDistance) {
 				if (Math.Sign(difference) == scaleDirection) {
 					scaleDirection *= -1;
 				}
 			}
 
-			Vector2 toTarget = new Vector2(target.X, target.Y) - new Vector2(X, Y);
-			var newAngle = Util.RAD_TO_DEG * (float)Math.Atan2(-toTarget.Y, toTarget.X);
-			var angleDiff = ((((newAngle - sprite.Angle) % 360) + 540) % 360) - 180;
-			var curAngle = (float)Math.Atan2(-direction.Y, direction.X);
-			var rotateAmount = 0.0f;// = Util.Clamp(angleDiff, -dirStepAmount, dirStepAmount);
-			rotateAmount = Util.Lerp(0, angleDiff, 0.07f);
-			direction = Util.Rotate(direction, rotateAmount);
-			sprite.Angle = (float)Math.Atan2(-direction.Y, direction.X) * Util.RAD_TO_DEG;
-
-			setOffset(ref eye1, eye1offset);
-			setOffset(ref eye2, eye2offset);
+			switch (curState) {
+				case State.Idle:
+					IdleUpdate();
+					break;
+				case State.Swim:
+					SwimUpdate();
+					break;
+			}
 
 			base.Update();
 
@@ -146,6 +156,47 @@ namespace LD31 {
 			CheckCollision(softSpot2);
 		}
 
+		private void IdleUpdate() {
+			Float();
+			LookAt(target.X, target.Y);
+		}
+
+		private void LookAt(float targetX, float targetY) {
+			Vector2 toTarget = new Vector2(targetX, targetY) - new Vector2(X, Y);
+			var newAngle = Util.RAD_TO_DEG * (float)Math.Atan2(-toTarget.Y, toTarget.X);
+			var angleDiff = ((((newAngle - sprite.Angle) % 360) + 540) % 360) - 180;
+			var curAngle = (float)Math.Atan2(-direction.Y, direction.X);
+			var rotateAmount = 0.0f;// = Util.Clamp(angleDiff, -dirStepAmount, dirStepAmount);
+			rotateAmount = Util.Lerp(0, angleDiff, 0.07f);
+			direction = Util.Rotate(direction, rotateAmount);
+			sprite.Angle = (float)Math.Atan2(-direction.Y, direction.X) * Util.RAD_TO_DEG;
+
+			setOffset(ref eye1, eye1offset);
+			setOffset(ref eye2, eye2offset);
+			setOffset(ref softlight1, softSpot1Offset);
+			setOffset(ref softlight2, softSpot2Offset);
+		}
+
+		private void Float() {
+			X = Util.Lerp(X, 960, 0.07f);
+			if (Math.Abs(X - 960) < 0.2f) {
+				X = 960;
+			}
+			
+			Y += Rand.Float(floatSpeed) * floatVelocity;
+			floatVelocity = Util.Lerp(floatVelocity, floatDirection, 0.01f);
+			var difference = Y - 540;
+			if (Math.Abs(difference) > maxDistance) {
+				if (Math.Sign(difference) == floatDirection) {
+					floatDirection *= -1;
+				}
+			}
+		}
+
+		private void SwimUpdate() {
+			LookAt(X + 20, Y);
+		}
+
 		private void setOffset(ref Light light, Vector2 offset) {
 			light.SetOffset(Util.Rotate(offset, sprite.Angle));
 		}
@@ -155,6 +206,53 @@ namespace LD31 {
 			collider.CenterOrigin();
 			collider.OriginX += o.X;
 			collider.OriginY += o.Y;
+		}
+
+		IEnumerator SwimAttack() {
+			curState = State.Swim;
+
+			// Turn on lights
+			softlight1.SetAlpha(0.6f);
+			softlight1.FadeIn(4f);
+
+			softlight2.SetAlpha(0.6f);
+			softlight2.FadeIn(4f);
+
+			float timeElapsed = 0.0f;
+			
+			while (timeElapsed < 5f) {
+				if (Math.Abs(Y - 540) > 3) {
+					Float();
+				}
+				timeElapsed += Game.RealDeltaTime * 0.001f;
+				yield return 0;
+			}
+
+			acceleration = new Vector2(0.5f, 0);
+			X += 0.5f;
+
+			while (X > 960) {
+				yield return 0;
+			}
+
+			while (X < 52) {
+				yield return 0;
+			}
+
+			acceleration = new Vector2(-0.5f, 0);
+
+			while (velocity.X > 0) {
+				yield return 0;
+			}
+
+			acceleration = Vector2.Zero;
+
+			softlight1.FadeOut(5f);
+			softlight2.FadeOut(5f);
+
+			yield return Coroutine.Instance.WaitForFrames(1);
+
+			curState = State.Idle;
 		}
 
 		private void CheckCollision(CircleCollider collider) {
@@ -180,8 +278,11 @@ namespace LD31 {
 				// Apply damage if okay
 				if (isHurt) {
 					var e = hit.Entity as Projectile;
-					ApplyDamage(e.damage);
+					if (e.damage > 1) {
+						ApplyDamage(e.damage);
+					}
 					e.HitEnemy();
+					Game.Coroutine.Start(SwimAttack());
 				}
 			}
 		}

@@ -9,11 +9,17 @@ using System.Threading.Tasks;
 namespace LD31 {
 	class Player : Entity {
 
+		protected int health = 4;
+		private float cooldownTimer = 2.0f;
+		private bool hurt = false;
+
 		enum AnimType {
 			Go, Attack
 		}
 
 		private Spritemap<AnimType> sprite = new Spritemap<AnimType>("assets/gfx/tentacool.png", 70, 87);
+
+		private Sound[] bounce = new Sound[3];
 
 		private float angle = 90;
 		private Vector2 direction = new Vector2(0, -1);
@@ -36,9 +42,19 @@ namespace LD31 {
 
 		private Light light;
 
+		private float bounceTimeout = 0.0f;
+
 		public Player(float x, float y, Session session) : base(x, y) {
 			// Assign session
 			this.session = session;
+
+			// Init bounce sounds
+			bounce[0] = new Sound("assets/sfx/bounce1.wav");
+			bounce[1] = new Sound("assets/sfx/bounce2.wav");
+			bounce[2] = new Sound("assets/sfx/bounce3.wav");
+			for (int i = 0; i < 3; ++i) {
+				bounce[i].Volume = 0.98f;
+			}
 
 			// Set up animations
 			sprite.Add(AnimType.Go, new Anim(new int[] { 0, 1, 2, 3, 4, }, new float[] { 5.0f }));
@@ -71,6 +87,15 @@ namespace LD31 {
 		public override void Update() {
 			// Reset variables
 			acceleration = Vector2.Zero;
+
+			bounceTimeout -= Game.RealDeltaTime * 0.001f;
+
+			if (Input.KeyPressed(Key.J)) {
+				Global.musicManager.PlayTrack(MusicManager.Tracks.BOSS);
+			}
+			if (Input.KeyPressed(Key.K)) {
+				Global.musicManager.PlayTrack(MusicManager.Tracks.GAME);
+			}
 
 			// Get player input
 			Vector2 inputDir;
@@ -112,6 +137,7 @@ namespace LD31 {
 				Vector2 awayFromEnemy = new Vector2(enemy.X, enemy.Y) - new Vector2(X, Y);
 				awayFromEnemy.Normalize();
 				velocity -= awayFromEnemy * 3;
+				BounceDamage();
 			}
 
 			// Make sure velocity doesn't go infinitely
@@ -133,6 +159,7 @@ namespace LD31 {
 						X -= i * Math.Sign(velocity.X);
 						velocity.X *= -0.9f;
 						acceleration.X = Math.Sign(velocity.X);
+						BounceDamage(false);
 						if (Math.Abs(velocity.X) < minBounce) {
 							velocity.X = minBounce * Math.Sign(velocity.X);
 						}
@@ -144,6 +171,7 @@ namespace LD31 {
 						Y -= i * Math.Sign(velocity.Y);
 						velocity.Y *= -0.9f;
 						acceleration.Y = Math.Sign(velocity.Y);
+						BounceDamage(false);
 						if (Math.Abs(velocity.Y) < minBounce) {
 							velocity.Y = minBounce * Math.Sign(velocity.Y);
 						}
@@ -181,6 +209,49 @@ namespace LD31 {
 			lastY = Y;
 
 			Wrap();
+		}
+
+		void BounceDamage(bool hurt = true) {
+			if (bounceTimeout <= 0.0f) {
+				var i = Rand.Int(0, 2);
+				bounceTimeout = bounce[i].Duration * 0.00001f;
+				bounce[i].Play();
+				if (hurt) {
+					ApplyDamage(1);
+				}
+			}
+		}
+
+		public void ApplyDamage(int damage) {
+			if (!hurt) {
+				health -= damage;
+				if (health > 0) {
+					Game.Coroutine.Start(DamageCooldown());
+				} else {
+					Game.Coroutine.Start(Die());
+				}
+			}
+		}
+
+		IEnumerator DamageCooldown() {
+			hurt = true;
+			sprite.Alpha = 0.8f;
+			light.FadeOut(0.3f);
+			yield return Coroutine.Instance.WaitForFrames((int)(cooldownTimer * 60));
+
+
+			hurt = false;
+			sprite.Alpha = 1.0f;
+			light.FadeIn(0.3f);
+		}
+
+		IEnumerator Die() {
+			// TODO: Death animation
+			
+			yield return 0;
+			RemoveSelf();
+			Level.lights.Remove(light);
+			((Level)Scene).GameOver();
 		}
 
 		void Attack() {

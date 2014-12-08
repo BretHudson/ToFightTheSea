@@ -47,8 +47,10 @@
     <Compile Include="enemies\SeaDisk.cs" />
     <Compile Include="enemies\SeaLink.cs" />
     <Compile Include="enemies\Squid.cs" />
+    <Compile Include="enemies\EnemySpawner.cs" />
     <Compile Include="environment\Corner.cs" />
     <Compile Include="enemies\Enemy.cs" />
+    <Compile Include="util\MusicManager.cs" />
     <Compile Include="scenes\MainMenu.cs" />
     <Compile Include="util\BretUtil.cs" />
     <Compile Include="util\Explosion.cs" />
@@ -113,6 +115,15 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="assets\gfx\wingwang.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\sfx\bounce1.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\sfx\bounce2.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\sfx\bounce3.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="assets\sfx\fart_noises.wav">
