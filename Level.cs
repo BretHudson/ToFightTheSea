@@ -23,6 +23,8 @@ namespace LD31 {
 		public static List<Light> lights = new List<Light>();
 		public static List<Light> darkness = new List<Light>();
 
+		public static Player player;
+
 		public Level() {
 			// Set up background
 			AddGraphic(background);
@@ -44,13 +46,14 @@ namespace LD31 {
 			base.Begin();
 
 			// Add the player
-			Add(new Player(1920 >> 1, 1080 >> 1, Global.PlayerOne));
+			player = Add(new Player(1920 >> 1, 1080 >> 1, Global.PlayerOne));
 
 			var explosion = Add(new Explosion(1920 >> 1, 1080 >> 1));
 			explosion.SetAlpha(2.0f, 1.0f, 0.0f);
 			explosion.SetRadius(2.0f, 100.0f, 580.0f, 560.0f, 480.0f);
 
-			Add(new Squid(1100, 480));
+			var squid = Add(new Squid(1300, 480));
+			squid.target = player;
 
 			// Create the four corners
 			CreateCorners();
@@ -62,6 +65,7 @@ namespace LD31 {
 
 			// Start the music
 			Global.gameMusic.Loop = true;
+			Global.gameMusic.Volume = 0;
 			Global.gameMusic.Play();
 		}
 

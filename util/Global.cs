@@ -16,15 +16,12 @@ namespace LD31 {
 
 		public static Image shockwave = new Image("assets/gfx/shockwave.png");
 
-		public static Image displacementMap = new Image("assets/gfx/displacementMap.png");
-		public static Image gradientMap = new Image("assets/gfx/gradientMap.png");
-		public static Image paletteMap = new Image("assets/gfx/paletteMap.jpg");
-
 		public static Music gameMusic = new Music("assets/sfx/music.wav", true);
 	}
 
 	public enum Tags {
 		PLAYER,
+		ENEMY,
 		SOLID,
 		PROJECTILE,
 		PLAYERATTACK,

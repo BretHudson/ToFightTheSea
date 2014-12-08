@@ -55,17 +55,18 @@ namespace LD31 {
 			return session;
 		}
 
-		static float timer = 0.0f;
-
 		static void ToggleFullscreen() {
-
-			Global.displacementMap.Scale = Util.Lerp(0.0f, 1.0f, timer);
-
 			if (game.Input.KeyPressed(Key.F)) {
 				fullscreen = !fullscreen;
 
 				if (fullscreen) game.SetWindow((int)Global.Resolution.X, (int)Global.Resolution.Y, true, true);
 				else game.SetWindow(960, 540, false, false);
+			}
+		}
+
+		static void ToggleMusic() {
+			if (game.Input.KeyPressed(Key.M)) {
+				Global.gameMusic.Volume = Math.Abs(Global.gameMusic.Volume - 1);
 			}
 		}
 
