@@ -55,6 +55,7 @@ namespace LD31 {
 
 			Layer = -1;
 
+			// Initilize light
 			light = new Light();
 			light.SetAlpha(0.7f);
 			light.SetColor(new Color("879DFF"), new Color("62D8E0"));
@@ -63,6 +64,8 @@ namespace LD31 {
 			light.SetRadiusSpan(5.0f);
 			light.entity = this;
 			Level.lights.Add(light);
+
+			// TODO: Make ink slow you down
 		}
 
 		public override void Update() {

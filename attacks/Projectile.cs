@@ -28,7 +28,7 @@ namespace LD31 {
 		}
 
 		IEnumerator BeginDeath() {
-			yield return Coroutine.Instance.WaitForSeconds(lifespan);
+			yield return Coroutine.Instance.WaitForFrames((int)(lifespan * 60));
 			if (!destroyed)
 				Game.Coroutine.Start(Destroy());
 		}

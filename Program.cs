@@ -26,6 +26,7 @@ namespace LD31 {
 
 			// Get some updating goodness
 			game.OnUpdate += ToggleFullscreen;
+			game.OnUpdate += ToggleMusic;
 			game.OnUpdate += UpdateMaps;
 
 			// Set up explosion shader
@@ -66,7 +67,7 @@ namespace LD31 {
 
 		static void ToggleMusic() {
 			if (game.Input.KeyPressed(Key.M)) {
-				Global.gameMusic.Volume = Math.Abs(Global.gameMusic.Volume - 1);
+				Sound.GlobalVolume = Music.GlobalVolume = Math.Abs(Music.GlobalVolume - 1);
 			}
 		}
 

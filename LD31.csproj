@@ -42,6 +42,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="attacks\LightningArea.cs" />
+    <Compile Include="enemies\FlyingGurnard.cs" />
+    <Compile Include="enemies\Ink.cs" />
     <Compile Include="enemies\Squid.cs" />
     <Compile Include="environment\Corner.cs" />
     <Compile Include="enemies\Enemy.cs" />
@@ -104,7 +106,16 @@
     <Content Include="assets\gfx\tentacool.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="assets\sfx\music.wav">
+    <Content Include="assets\gfx\wingwang.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\sfx\fart_noises.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\sfx\ink_noise.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\sfx\To Fight The Sea.mp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="assets\sfx\To Fight The Sea.wav">

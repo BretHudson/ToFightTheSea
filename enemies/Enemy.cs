@@ -62,7 +62,7 @@ namespace LD31 {
 
 		IEnumerator DamageCooldown() {
 			hurt = true;
-			yield return Coroutine.Instance.WaitForSeconds(cooldownTimer);
+			yield return Coroutine.Instance.WaitForFrames((int)(cooldownTimer * 60));
 			hurt = false;
 		}
 

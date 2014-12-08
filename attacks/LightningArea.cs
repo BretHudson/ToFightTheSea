@@ -32,7 +32,7 @@ namespace LD31 {
 			explosion.SetAlpha(1.0f, 1.0f, 0.0f);
 			explosion.SetRadius(1.0f, 80.0f, 550.0f, 450.0f, 400.0f);
 
-			yield return Coroutine.Instance.WaitForSeconds(0.3f);
+			yield return Coroutine.Instance.WaitForFrames((int)(0.3f * 60));
 
 			explosion = Scene.Add(new Explosion(X, Y));
 			explosion.SetAlpha(1.0f, 1.0f, 0.0f);

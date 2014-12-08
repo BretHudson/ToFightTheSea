@@ -25,6 +25,10 @@ namespace LD31 {
 
 		public static Player player;
 
+		public enum Musics {
+			GAME, BOSS
+		}
+
 		public Level() {
 			// Set up background
 			AddGraphic(background);
@@ -52,8 +56,10 @@ namespace LD31 {
 			explosion.SetAlpha(2.0f, 1.0f, 0.0f);
 			explosion.SetRadius(2.0f, 100.0f, 580.0f, 560.0f, 480.0f);
 
-			var squid = Add(new Squid(1300, 480));
-			squid.target = player;
+			Add(new FlyingGurnard(player));
+
+			/*var squid = Add(new Squid(1300, 480));
+			squid.target = player;*/
 
 			// Create the four corners
 			CreateCorners();
@@ -64,9 +70,30 @@ namespace LD31 {
 			Game.AddSurface(darknessSurface);
 
 			// Start the music
-			Global.gameMusic.Loop = true;
-			Global.gameMusic.Volume = 0;
-			Global.gameMusic.Play();
+#if DEBUG
+			Music.GlobalVolume = 0;
+			PlayTrack(Musics.BOSS);
+#else
+			PlayTrack(Musics.GAME);
+#endif
+		}
+
+		public static void PlayTrack(Musics music) {
+			Music track = null;
+			switch (music) {
+				case Musics.GAME:
+					track = Global.gameMusic;
+					break;
+				case Musics.BOSS:
+					track = Global.bossMusic;
+					break;
+				default:
+					track = null;
+					break;
+			}
+
+			track.Loop = true;
+			track.Play();
 		}
 
 		private void CreateCorners() {
