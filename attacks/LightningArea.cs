@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace LD31 {
 	class LightningArea : Projectile {
 
-		public LightningArea(float x, float y, Vector2 direction) : base(x, y, direction, 0.1f, 100, 1.7f, (int)Tags.PROJECTILE, (int)Tags.PLAYERATTACK) {
+		public LightningArea(float x, float y, Vector2 direction) : base(x, y, direction, 0.1f, 110, 1.7f, 1, (int)Tags.PROJECTILE, (int)Tags.PLAYERATTACK) {
 			light = new Light();
 			light.SetAlpha(0.5f, 0.7f);
 			light.SetAlphaSpan(0.3f);
@@ -25,6 +25,10 @@ namespace LD31 {
 			base.Added();
 
 			Game.Instance.Coroutine.Start(Ripple());
+		}
+
+		public override void HitEnemy() {
+			// Do nothing
 		}
 
 		IEnumerator Ripple() {

@@ -28,5 +28,6 @@ namespace LD31 {
 		PLAYERATTACK,
 		ENEMYATTACK,
 		INK,
+		SEALINK,
 	}
 }

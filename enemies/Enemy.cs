@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace LD31 {
 	class Enemy : Entity {
 
-		private int health;
+		protected int health;
 		private float cooldownTimer;
 		private bool hurt = false;
 
@@ -44,7 +44,10 @@ namespace LD31 {
 			X += velocity.X;
 			Y += velocity.Y;
 
+			CheckCollisions();
 			Wrap();
+			if (health > 0)
+				CheckCollisions();
 		}
 
 		public void Kill() {
@@ -55,12 +58,12 @@ namespace LD31 {
 			if (target != null) {
 				Vector2 targetPos = new Vector2(target.X, target.Y);
 
-				if (Math.Abs(targetPos.X - X) > 960) {
-					targetPos.X -= Math.Sign(targetPos.X - X) * 1920;
+				if (Math.Abs(targetPos.X - X) > 1000) {
+					targetPos.X -= Math.Sign(targetPos.X - X) * 2000;
 				}
 
-				if (Math.Abs(targetPos.Y - Y) > 560) {
-					targetPos.Y -= Math.Sign(targetPos.Y - Y) * 1080;
+				if (Math.Abs(targetPos.Y - Y) > 600) {
+					targetPos.Y -= Math.Sign(targetPos.Y - Y) * 1200;
 				}
 
 				return targetPos;
@@ -90,9 +93,19 @@ namespace LD31 {
 		}
 
 		IEnumerator Die() {
-			SetHitbox(0, 0, -1);
+			Hitbox.RemoveTag((int)Tags.ENEMYATTACK);
 			yield return Death();
 			RemoveSelf();
+		}
+
+		void CheckCollisions() {
+			var attack = Collide(X, Y, (int)Tags.PLAYERATTACK);
+			if (attack != null) {
+				var e = attack.Entity as Projectile;
+				e.HitEnemy();
+				ApplyDamage(e.damage);
+				// Let attack know it's hit something
+			}
 		}
 
 		void Wrap() {

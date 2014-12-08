@@ -105,14 +105,24 @@ namespace LD31 {
 				}
 			}
 
-			// Move object
-			X += velocity.X;
-			Y += velocity.Y;
+			// Repel away from enemies
+			var enemyHit = Collide(X, Y, (int)Tags.ENEMY);
+			if (enemyHit != null) {
+				var enemy = enemyHit.Entity;
+				Vector2 awayFromEnemy = new Vector2(enemy.X, enemy.Y) - new Vector2(X, Y);
+				awayFromEnemy.Normalize();
+				velocity -= awayFromEnemy * 3;
+			}
 
+			// Make sure velocity doesn't go infinitely
 			if (velocity.Length > maxspeed) {
 				velocity.Normalize();
 				velocity *= maxspeed;
 			}
+
+			// Move object
+			X += velocity.X;
+			Y += velocity.Y;
 			
 			// Check to see if inside of object
 			var c = Collide(X, Y, (int)Tags.SOLID);

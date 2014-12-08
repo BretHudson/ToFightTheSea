@@ -44,13 +44,16 @@
     <Compile Include="attacks\LightningArea.cs" />
     <Compile Include="enemies\FlyingGurnard.cs" />
     <Compile Include="enemies\Ink.cs" />
+    <Compile Include="enemies\SeaDisk.cs" />
+    <Compile Include="enemies\SeaLink.cs" />
     <Compile Include="enemies\Squid.cs" />
     <Compile Include="environment\Corner.cs" />
     <Compile Include="enemies\Enemy.cs" />
+    <Compile Include="scenes\MainMenu.cs" />
     <Compile Include="util\BretUtil.cs" />
     <Compile Include="util\Explosion.cs" />
     <Compile Include="util\Global.cs" />
-    <Compile Include="Level.cs" />
+    <Compile Include="scenes\Level.cs" />
     <Compile Include="util\Light.cs" />
     <Compile Include="attacks\LightningBall.cs" />
     <Compile Include="Player.cs" />
@@ -92,6 +95,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="assets\gfx\poof.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\gfx\salp.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="assets\gfx\shockwave.png">

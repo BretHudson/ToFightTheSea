@@ -15,12 +15,15 @@ namespace LD31 {
 
 		protected Light light = null;
 
-		public Projectile(float x, float y, Vector2 direction, float speed, int radius, float lifespan, params int[] tags) : base(x, y) {
+		public int damage;
+
+		public Projectile(float x, float y, Vector2 direction, float speed, int radius, float lifespan, int damage, params int[] tags) : base(x, y) {
 			direction.Normalize();
 			this.velocity = direction * speed;
 			this.lifespan = lifespan;
 			Collider = new CircleCollider(radius, tags);
 			Collider.CenterOrigin();
+			this.damage = damage;
 		}
 
 		public override void Added() {
@@ -44,6 +47,10 @@ namespace LD31 {
 			}
 
 			Wrap();
+		}
+
+		virtual public void HitEnemy() {
+			Game.Coroutine.Start(Destroy());
 		}
 
 		/*public override void Render() {

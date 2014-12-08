@@ -50,7 +50,8 @@ namespace LD31 {
 			base.Begin();
 
 			// Add the player
-			player = Add(new Player(1920 >> 1, 1080 >> 1, Global.PlayerOne));
+			//player = Add(new Player(1920 >> 1, 1080 >> 1, Global.PlayerOne));
+			player = Add(new Player(400, 1080 >> 1, Global.PlayerOne));
 
 			var explosion = Add(new Explosion(1920 >> 1, 1080 >> 1));
 			explosion.SetAlpha(2.0f, 1.0f, 0.0f);
@@ -58,8 +59,11 @@ namespace LD31 {
 
 			Add(new FlyingGurnard(player));
 
-			var squid = Add(new Squid(1300, 480));
-			squid.target = player;
+			var seaLink = Add(new SeaLink(500, 500, 16, Vector2.Zero));
+			seaLink.target = player;
+
+			/*var squid = Add(new Squid(1300, 480));
+			squid.target = player;*/
 
 			// Create the four corners
 			CreateCorners();

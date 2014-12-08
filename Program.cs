@@ -49,9 +49,9 @@ namespace LD31 {
 			session.Controller.Down.AddKey(Key.Down, Key.S);
 			session.Controller.Right.AddKey(Key.Right, Key.D);
 
-			session.Controller.Cross.AddKey(Key.C);
-			session.Controller.Square.AddKey(Key.X); // Ball
-			session.Controller.Triangle.AddKey(Key.Z); // Area attack
+			session.Controller.Square.AddKey(Key.Z); // Ball
+			session.Controller.Triangle.AddKey(Key.X); // Area attack
+			session.Controller.Cross.AddKey(Key.C, Key.Return);
 			
 			return session;
 		}

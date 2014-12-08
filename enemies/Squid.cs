@@ -24,7 +24,7 @@ namespace LD31 {
 			Graphic = sprite;
 			sprite.CenterOrigin();
 
-			SetHitbox(20, 80, (int)Tags.ENEMY);
+			SetHitbox(20, 80, (int)Tags.ENEMY, (int)Tags.ENEMYATTACK);
 
 			// Set up sprite
 			sprite.Add(AnimType.Go, new Anim(new int[] { 1, 2, 3, 4, 0, }, new float[] { 7.0f }));
