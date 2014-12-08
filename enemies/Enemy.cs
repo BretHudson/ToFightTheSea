@@ -22,6 +22,8 @@ namespace LD31 {
 		private float angle;
 		protected float dirStepAmount = 5.0f;
 
+		public Entity target;
+
 		protected Light light;
 
 		public Enemy(float x, float y, int health, float cooldown) : base(x, y) {
@@ -47,6 +49,23 @@ namespace LD31 {
 
 		public void Kill() {
 			ApplyDamage(1000);
+		}
+
+		public Vector2 GetTargetPos() {
+			if (target != null) {
+				Vector2 targetPos = new Vector2(target.X, target.Y);
+
+				if (Math.Abs(targetPos.X - X) > 960) {
+					targetPos.X -= Math.Sign(targetPos.X - X) * 1920;
+				}
+
+				if (Math.Abs(targetPos.Y - Y) > 560) {
+					targetPos.Y -= Math.Sign(targetPos.Y - Y) * 1080;
+				}
+
+				return targetPos;
+			}
+			return Vector2.Zero;
 		}
 
 		public void ApplyDamage(int damage) {
@@ -77,11 +96,11 @@ namespace LD31 {
 		}
 
 		void Wrap() {
-			var left = 0 - ((int)Hitbox.Width >> 1);
-			var right = 1920 + ((int)Hitbox.Width >> 1);
+			var left = 0 - (Collider.Width * 0.95f);
+			var right = 1920 + (Collider.Width * 0.95f);
 
-			var top = 0 - ((int)Hitbox.Height >> 1);
-			var bottom = 1080 + ((int)Hitbox.Height >> 1);
+			var top = 0 - (Collider.Height * 0.95f);
+			var bottom = 1080 + (Collider.Height * 0.95f);
 
 			if (X < left) {
 				X = right;

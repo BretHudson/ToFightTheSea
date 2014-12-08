@@ -231,22 +231,22 @@ namespace LD31 {
 		}
 
 		void Wrap() {
-			var left = 0 - ((int)Hitbox.Width >> 1);
-			var right = 1920 + ((int)Hitbox.Width >> 1);
+			var left = 0 - (Hitbox.Width * 0.95f);
+			var right = 1920 + (Hitbox.Width * 0.95f);
 
-			var top = 0 - ((int)Hitbox.Height >> 1);
-			var bottom = 1080 + ((int)Hitbox.Height >> 1);
+			var top = 0 - (Hitbox.Height * 0.95f);
+			var bottom = 1080 + (Hitbox.Height * 0.95f);
 
 			if (X < left) {
-				X = right;
+				lastX = X = right;
 			} else if (X > right) {
-				X = left;
+				lastX = X = left;
 			}
 
 			if (Y < top) {
-				Y = bottom;
+				lastY = Y = bottom;
 			} else if (Y > bottom) {
-				Y = top;
+				lastY = Y = top;
 			}
 		}
 

@@ -72,11 +72,11 @@ namespace LD31 {
 		}
 
 		void Wrap() {
-			var left = 0 - ((int)Collider.Width >> 1);
-			var right = 1920 + ((int)Collider.Width >> 1);
+			var left = 0 - (Collider.Width * 0.95f);
+			var right = 1920 + (Collider.Width * 0.95f);
 
-			var top = 0 - ((int)Collider.Height >> 1);
-			var bottom = 1080 + ((int)Collider.Height >> 1);
+			var top = 0 - (Collider.Height * 0.95f);
+			var bottom = 1080 + (Collider.Height * 0.95f);
 
 			if (X < left) {
 				X = right;

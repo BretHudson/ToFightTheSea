@@ -15,7 +15,6 @@ namespace LD31 {
 
 		private Spritemap<AnimType> sprite = new Spritemap<AnimType>("assets/gfx/squeedsquad.png", 75, 179);
 
-		public Entity target;
 		private bool avoid = false;
 
 		private float friction = 0.25f;
@@ -72,10 +71,10 @@ namespace LD31 {
 			// Rotate towards target
 			Vector2 toTarget;
 			if (!avoid) {
-				toTarget = new Vector2(target.X, target.Y) - new Vector2(X, Y);
+				toTarget = GetTargetPos() - new Vector2(X, Y);
 			} else {
 				// TODO: Enhance this a bit
-				toTarget = new Vector2(X, Y) - new Vector2(target.X, target.Y);
+				toTarget = new Vector2(X, Y) - GetTargetPos();
 			}
 
 			var newAngle = Util.RAD_TO_DEG * (float)Math.Atan2(-toTarget.Y, toTarget.X);

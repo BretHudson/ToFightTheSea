@@ -58,8 +58,8 @@ namespace LD31 {
 
 			Add(new FlyingGurnard(player));
 
-			/*var squid = Add(new Squid(1300, 480));
-			squid.target = player;*/
+			var squid = Add(new Squid(1300, 480));
+			squid.target = player;
 
 			// Create the four corners
 			CreateCorners();
@@ -98,10 +98,10 @@ namespace LD31 {
 
 		private void CreateCorners() {
 			// Entities
-			var corner1 = Add(new Corner(0, 0));
-			var corner2 = Add(new Corner(0, Game.Height - (int)Corner.size.Y));
-			var corner3 = Add(new Corner(Game.Width - (int)Corner.size.X, Game.Height - (int)Corner.size.Y));
-			var corner4 = Add(new Corner(Game.Width - (int)Corner.size.X, 0));
+			var corner1 = Add(new Corner(-40, -40));
+			var corner2 = Add(new Corner(-40, Game.Height - (int)Corner.size.Y + 40));
+			var corner3 = Add(new Corner(Game.Width - (int)Corner.size.X + 40, Game.Height - (int)Corner.size.Y + 40));
+			var corner4 = Add(new Corner(Game.Width - (int)Corner.size.X + 40, -40));
 
 			// Lights
 			#region Lights

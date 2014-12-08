@@ -14,17 +14,16 @@ namespace LD31 {
 
 		private Spritemap<AnimType> sprite = new Spritemap<AnimType>("assets/gfx/wingwang.png", 425, 696);
 		private float floatDirection = -1;
-		private Range floatSpeed = new Range(0.4f, 0.7f);
+		private float floatVelocity = -1;
+		private Range floatSpeed = new Range(0.35f, 0.6f);
 		private float maxDistance = 20.0f;
 
 		private Light eye1, eye2;
 		private Vector2 eye1offset, eye2offset;
 
-		private Entity target;
-
 		public FlyingGurnard(Entity target) : base(960, 540, 100, 10.0f) {
 			// Initialize sprite
-			sprite.Add(AnimType.Idle, new Anim(new int[] { 0, 1, 2, 3, 4, 5, }, new float[] { 6.0f }));
+			sprite.Add(AnimType.Idle, new Anim(new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 }, new float[] { 4.0f }));
 			sprite.Play(AnimType.Idle);
 			sprite.CenterOrigin();
 			Graphic = sprite;
@@ -51,17 +50,20 @@ namespace LD31 {
 			eye2.SetOffset(eye2offset);
 			eye2.entity = this;
 			Level.lights.Add(eye2);
-
+			
+			// Reset direction to right
 			direction = new Vector2(0, 1);
 		}
 
 		public override void Update() {
 			// Float
-			Y += Rand.Float(floatSpeed) * floatDirection;
-			if (Math.Abs(Y - 540) > maxDistance) {
-				Y = maxDistance * Math.Sign(Y - 540) + 540;
-				floatDirection *= -1;
-				// TODO: Make this more smooth
+			Y += Rand.Float(floatSpeed) * floatVelocity;
+			floatVelocity = Util.Lerp(floatVelocity, floatDirection, 0.01f);
+			var difference = Y - 540;
+			if (Math.Abs(difference) > maxDistance) {
+				if (Math.Sign(difference) == floatDirection) {
+					floatDirection *= -1;
+				}
 			}
 
 			// TODO: Find a good way to rotate offsets and lights and stuff
@@ -74,7 +76,14 @@ namespace LD31 {
 			direction = Util.Rotate(direction, rotateAmount);
 			sprite.Angle = (float)Math.Atan2(-direction.Y, direction.X) * Util.RAD_TO_DEG;
 
+			setOffset(ref eye1, eye1offset);
+			setOffset(ref eye2, eye2offset);
+
 			base.Update();
+		}
+
+		private void setOffset(ref Light light, Vector2 offset) {
+			light.SetOffset(Util.Rotate(offset, sprite.Angle));
 		}
 
 	}
