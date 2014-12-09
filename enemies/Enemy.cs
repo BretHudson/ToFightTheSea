@@ -28,12 +28,44 @@ namespace LD31 {
 
 		protected Light light;
 
+		protected float alpha = 0.0f;
+
 		public Enemy(float x, float y, int health, float cooldown) : base(x, y) {
 			this.health = health;
 			cooldownTimer = cooldown;
 
 			solidChecker = new LineCollider(0, 0, 0, 0, -1);
 			AddCollider(solidChecker);
+
+			EnemySpawner.Instance.AddEnemy(this);
+		}
+
+		public override void Added() {
+			base.Added();
+			Game.Coroutine.Start(FadeIn());
+		}
+
+		virtual protected IEnumerator FadeIn() {
+			alpha = 0.0f;
+			while (alpha < 0.68f) {
+				alpha = Util.Lerp(alpha, 1.0f, 0.01f);
+				yield return 0;
+			}
+			while (alpha < 0.98f) {
+				alpha = Util.Lerp(alpha, 1.0f, 0.06f);
+				yield return 0;
+			}
+			alpha = 1.0f;
+		}
+
+		virtual protected IEnumerator FadeOut() {
+			alpha = 1.0f;
+			while (alpha > 0.02f) {
+				alpha = Util.Lerp(alpha, 0.0f, 0.07f);
+				yield return 0;
+			}
+			alpha = 0.0f;
+			RemoveSelf();
 		}
 
 		public override void Update() {
@@ -96,7 +128,8 @@ namespace LD31 {
 		}
 
 		public void ApplyDamage(int damage) {
-			if (!hurt) {
+			if ((!hurt) && (health > 0)) {
+				hurt = true;
 				health -= damage;
 				if (health > 0) {
 					Game.Coroutine.Start(DamageCooldown());
@@ -107,7 +140,6 @@ namespace LD31 {
 		}
 
 		IEnumerator DamageCooldown() {
-			hurt = true;
 			yield return Coroutine.Instance.WaitForFrames((int)(cooldownTimer * 60));
 			hurt = false;
 		}
@@ -117,9 +149,10 @@ namespace LD31 {
 		}
 
 		IEnumerator Die() {
-			Hitbox.RemoveTag((int)Tags.ENEMYATTACK);
+			Game.Coroutine.Start(FadeOut());
+			Collider.RemoveTag((int)Tags.ENEMYATTACK);
 			yield return Death();
-			RemoveSelf();
+			EnemySpawner.Instance.RemoveEnemy(this);
 		}
 
 		void CheckCollisions() {

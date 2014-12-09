@@ -90,17 +90,15 @@ namespace LD31 {
 
 			bounceTimeout -= Game.RealDeltaTime * 0.001f;
 
-			if (Input.KeyPressed(Key.J)) {
-				Global.musicManager.PlayTrack(MusicManager.Tracks.BOSS);
-			}
-			if (Input.KeyPressed(Key.K)) {
-				Global.musicManager.PlayTrack(MusicManager.Tracks.GAME);
-			}
-
 			// Get player input
 			Vector2 inputDir;
 			inputDir.X = Convert.ToInt32(session.Controller.Right.Down) - Convert.ToInt32(session.Controller.Left.Down);
 			inputDir.Y = Convert.ToInt32(session.Controller.Down.Down) - Convert.ToInt32(session.Controller.Up.Down);
+
+			if (!session.Controller.AxisLeft.Neutral) {
+				inputDir.X = session.Controller.AxisLeft.X;
+				inputDir.Y = session.Controller.AxisLeft.Y;
+			}
 
 			if (!canMove)
 				inputDir = Vector2.Zero;
@@ -131,6 +129,15 @@ namespace LD31 {
 			}
 
 			// Repel away from enemies
+			var repelHit = Collide(X, Y, (int)Tags.REPEL);
+			if (repelHit != null) {
+				var repel = repelHit.Entity;
+				Vector2 awayFromEntity = new Vector2(repel.X, repel.Y) - new Vector2(X, Y);
+				awayFromEntity.Normalize();
+				velocity -= awayFromEntity * 3;
+				BounceDamage(false);
+			}
+
 			var enemyHit = Collide(X, Y, (int)Tags.ENEMY);
 			if (enemyHit != null) {
 				var enemy = enemyHit.Entity;
@@ -141,6 +148,12 @@ namespace LD31 {
 			}
 
 			// Make sure velocity doesn't go infinitely
+			var inputLength = inputDir.Length;
+			if ((inputLength != 0) && (velocity.Length > inputLength * maxspeed)) {
+				velocity.Normalize();
+				velocity *= inputLength * maxspeed;
+			}
+
 			if (velocity.Length > maxspeed) {
 				velocity.Normalize();
 				velocity *= maxspeed;

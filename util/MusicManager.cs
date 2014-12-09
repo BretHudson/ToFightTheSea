@@ -18,13 +18,13 @@ namespace LD31 {
 
 		private Music currentTrack = null;
 
+		private int currentCoroutine = -1;
+
 		public MusicManager() {
 #if DEBUG
-			Music.GlobalVolume = 1;
-			PlayTrack(Tracks.GAME);
-#else
-			PlayTrack(Tracks.GAME);
+			Music.GlobalVolume = 0;
 #endif
+			PlayTrack(Tracks.GAME);
 		}
 
 		public void PlayTrack(Tracks track) {
@@ -49,7 +49,10 @@ namespace LD31 {
 				newTrack.Volume = 1;
 				newTrack.Play();
 			} else {
-				Game.Instance.Coroutine.Start(FadeTracks(currentTrack, newTrack));
+				if (currentCoroutine > -1) {
+					Game.Instance.Coroutine.Stop(currentCoroutine);
+				}
+				currentCoroutine = Game.Instance.Coroutine.Start(FadeTracks(currentTrack, newTrack));
 			}
 
 			currentTrack = newTrack;

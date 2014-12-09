@@ -36,11 +36,11 @@ namespace LD31 {
 		private Vector2 softSpot2Offset = new Vector2(30, -130);
 		private Vector2 repelOffset = new Vector2(80, 0);
 
-		private CircleCollider softSpot1 = new CircleCollider(115, (int)Tags.ENEMY);
-		private CircleCollider softSpot2 = new CircleCollider(115, (int)Tags.ENEMY);
-		private CircleCollider repelCollider = new CircleCollider(270, (int)Tags.ENEMY);
+		private CircleCollider softSpot1 = new CircleCollider(115, -1);
+		private CircleCollider softSpot2 = new CircleCollider(115, -1);
+		private CircleCollider repelCollider = new CircleCollider(270, (int)Tags.REPEL);
 
-		public FlyingGurnard(Entity target) : base(960, 540, 100, 10.0f) {
+		public FlyingGurnard(Entity target) : base(960, 540, 20, 10.0f) {
 			// Initialize sprite
 			sprite.CenterOrigin();
 			Graphic = sprite;
@@ -86,7 +86,7 @@ namespace LD31 {
 			Level.lights.Add(softlight2);
 
 			// Lights
-			eye1 = new Light();
+			eye1 = new Light(0, 4.0f);
 			eye1.SetAlpha(0.6f);
 			eye1.SetRadius(100.0f);
 			eye1offset = new Vector2(-170, 50);
@@ -94,7 +94,7 @@ namespace LD31 {
 			eye1.entity = this;
 			Level.lights.Add(eye1);
 
-			eye2 = new Light();
+			eye2 = new Light(0, 4.0f);
 			eye2.SetAlpha(0.6f);
 			eye2.SetRadius(100.0f);
 			eye2offset = new Vector2(-170, -15);
@@ -109,15 +109,43 @@ namespace LD31 {
 			maxspeed = 30.0f;
 		}
 
-		public override void Render() {
-			base.Render();
+		public override void Added() {
+			base.Added();
 
-			/*for (int i = 0; i < Colliders.Count; ++i) {
-				Colliders[i].Render();
-			}*/
+			var explosion = Scene.Add(new Explosion(1920 >> 1, 1080 >> 1));
+			explosion.SetAlpha(2.0f, 1.0f, 0.0f);
+			explosion.SetRadius(2.0f, 100.0f, 580.0f, 560.0f, 480.0f);
 		}
 
+		protected override IEnumerator FadeOut() {
+			eye1.FadeOut(0.5f);
+			eye2.FadeOut(0.5f);
+			softlight1.FadeOut(0.1f);
+			softlight2.FadeOut(0.1f);
+			return base.FadeOut();
+		}
+
+		protected override IEnumerator FadeIn() {
+			yield return base.FadeIn();
+
+			// Add Enemy tag to colliders
+			softSpot1.AddTag((int)Tags.ENEMY);
+			softSpot2.AddTag((int)Tags.ENEMY);
+			repelCollider.AddTag((int)Tags.ENEMY);
+			repelCollider.RemoveTag((int)Tags.REPEL);
+		}
+
+		/*public override void Render() {
+			base.Render();
+
+			for (int i = 0; i < Colliders.Count; ++i) {
+				Colliders[i].Render();
+			}
+		}*/
+
 		public override void Update() {
+			sprite.Alpha = alpha;
+
 			// Scale breath
 			sprite.ScaleY += Rand.Float(scaleSpeed) * scaleVelocity;
 			scaleVelocity = Util.Lerp(scaleVelocity, scaleDirection, 0.05f);
@@ -224,7 +252,7 @@ namespace LD31 {
 				if (Math.Abs(Y - 540) > 3) {
 					Float();
 				}
-				timeElapsed += Game.RealDeltaTime * 0.001f;
+				timeElapsed += Game.Instance.RealDeltaTime * 0.001f;
 				yield return 0;
 			}
 
@@ -249,6 +277,11 @@ namespace LD31 {
 
 			softlight1.FadeOut(5f);
 			softlight2.FadeOut(5f);
+
+			var num = Rand.Int(2, 3);
+			for (int i = 0; i < num; ++i) {
+				EnemySpawner.Instance.SpawnRandomEnemy();
+			}
 
 			yield return Coroutine.Instance.WaitForFrames(1);
 
@@ -280,9 +313,11 @@ namespace LD31 {
 					var e = hit.Entity as Projectile;
 					if (e.damage > 1) {
 						ApplyDamage(e.damage);
+						if (health > 0) {
+							Game.Coroutine.Start(SwimAttack());
+						}
 					}
 					e.HitEnemy();
-					Game.Coroutine.Start(SwimAttack());
 				}
 			}
 		}

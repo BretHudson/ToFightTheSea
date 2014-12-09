@@ -51,6 +51,8 @@ namespace LD31 {
 		}
 
 		public override void Added() {
+			base.Added();
+			
 			Game.Coroutine.Start(AddBaby());
 		}
 
@@ -62,7 +64,6 @@ namespace LD31 {
 				child = Scene.Add(new SeaLink(X, Y, babies - 1, velocity * (spaceAmount / 2)));
 				child.head = this;
 				child.target = this;
-				EnemySpawner.Instance.AddEnemy(child);
 			} else {
 				var explosion = Scene.Add(new Explosion(X, Y));
 				explosion.SetAlpha(3.0f, 0.5f, 1.0f, 0.8f, 0.5f);
@@ -126,8 +127,10 @@ namespace LD31 {
 			if (head != null) {
 				head.child = null;
 			}
-			personalSpace.RemoveTag((int)Tags.SEALINK);
-			personalSpace = null;
+			if (personalSpace != null) {
+				personalSpace.RemoveTag((int)Tags.SEALINK);
+				personalSpace = null;
+			}
 			yield return base.Death();
 		}
 

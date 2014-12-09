@@ -17,6 +17,10 @@ namespace LD31 {
 		public static Image shockwave = new Image("assets/gfx/shockwave.png");
 
 		public static MusicManager musicManager = new MusicManager();
+
+		public static float backgroundTimer = 0.0f;
+
+		public static int fadeOutFrames = 60;
 	}
 
 	public enum Tags {
@@ -28,5 +32,7 @@ namespace LD31 {
 		ENEMYATTACK,
 		INK,
 		SEALINK,
+		FATFISH,
+		REPEL,
 	}
 }

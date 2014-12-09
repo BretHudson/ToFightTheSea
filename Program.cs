@@ -22,7 +22,12 @@ namespace LD31 {
 			Global.PlayerOne = CreateSession("PlayerOne");
 
 			// Create the first scene
-			game.FirstScene = new Level();
+#if DEBUG
+			//game.FirstScene = new Level();
+			game.FirstScene = new MainMenu();
+#else
+			game.FirstScene = new MainMenu();
+#endif
 
 			// Get some updating goodness
 			game.OnUpdate += ToggleFullscreen;
@@ -34,7 +39,7 @@ namespace LD31 {
 			game.Surface.AddShader(Global.explosionShader);
 			Global.shockwave.CenterOrigin();
 
-			
+			game.EnableQuitButton = false;
 
 			// Start the game
 			game.Start();
@@ -52,6 +57,21 @@ namespace LD31 {
 			session.Controller.Square.AddKey(Key.Z); // Ball
 			session.Controller.Triangle.AddKey(Key.X); // Area attack
 			session.Controller.Cross.AddKey(Key.C, Key.Return);
+
+			// Let's give that gamepad some lovin'!
+			for (int i = 0; i < 4; ++i) {
+				session.Controller.Up.AddAxisButton(AxisButton.PovYMinus, i);
+				session.Controller.Left.AddAxisButton(AxisButton.PovXMinus, i);
+				session.Controller.Down.AddAxisButton(AxisButton.PovYPlus, i);
+				session.Controller.Right.AddAxisButton(AxisButton.PovXPlus, i);
+
+				session.Controller.AxisLeft.AddAxis(JoyAxis.PovX, JoyAxis.PovY, i);
+				session.Controller.AxisLeft.AddAxis(JoyAxis.X, JoyAxis.Y, i);
+
+				session.Controller.Square.AddButton(2, i);
+				session.Controller.Triangle.AddButton(3, i);
+				session.Controller.Cross.AddButton(0, i);
+			}
 			
 			return session;
 		}

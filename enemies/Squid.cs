@@ -20,11 +20,14 @@ namespace LD31 {
 		private float friction = 0.25f;
 		private float aspeed = 1.5f;
 
+		private bool inked = false;
+
 		public Squid(float x, float y) : base(x, y, 10, 0.5f) {
 			Graphic = sprite;
 			sprite.CenterOrigin();
 
-			SetHitbox(20, 80, (int)Tags.ENEMY, (int)Tags.ENEMYATTACK);
+			Collider = new CircleCollider(40, (int)Tags.ENEMY, (int)Tags.ENEMYATTACK);
+			Collider.CenterOrigin();
 
 			// Set up sprite
 			sprite.Add(AnimType.Go, new Anim(new int[] { 1, 2, 3, 4, 0, }, new float[] { 7.0f }));
@@ -43,7 +46,7 @@ namespace LD31 {
 			base.Added();
 
 			// Create the squid's glow light
-			light = new Light();
+			light = new Light(0, 5.0f);
 			light.SetAlpha(0.7f);
 			light.SetColor(new Color("EF473E"));
 			light.SetRadius(sprite.Height + 30);
@@ -54,8 +57,15 @@ namespace LD31 {
 			
 		}
 
+		protected override IEnumerator FadeOut() {
+			light.FadeOut(0.5f);
+			return base.FadeOut();
+		}
+
 		public override void Update() {
 			base.Update();
+
+			sprite.Alpha = alpha;
 
 			// Apply friction
 			var magnitude = velocity.Length;
@@ -83,7 +93,19 @@ namespace LD31 {
 			velocity = Util.Rotate(velocity, rotateAmount);
 			sprite.Angle = (float)Math.Atan2(-velocity.Y, velocity.X) * Util.RAD_TO_DEG - 90;
 
-			if (Input.KeyPressed(Key.Space)) {
+			var enemy = Collide(X, Y, (int)Tags.ENEMY);
+			if (enemy != null) {
+				var e = enemy.Entity;
+				var push = new Vector2(X - e.X, Y - e.Y);
+				if (push.X == 0 && push.Y == 0) {
+					push = new Vector2(Rand.Float(-1, 1), Rand.Float(-1, 1));
+				}
+				push.Normalize(5.0f);
+				velocity += push;
+			}
+
+			if ((!inked) && (health <= 5)) {
+				inked = avoid = true;
 				Game.Coroutine.Start(Ink());
 			}
 		}
