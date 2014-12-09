@@ -141,7 +141,6 @@ namespace LD31 {
 			yield return Coroutine.Instance.WaitForFrames(framesBeforeWave);
 
 			SpawnEnemy(EnemyType.LINK);
-			SpawnEnemy(EnemyType.LINK);
 			SpawnEnemy(EnemyType.SQUID);
 			checkForEnemies = true;
 			yield return 0;
@@ -154,8 +153,6 @@ namespace LD31 {
 
 			SpawnEnemy(EnemyType.LINK);
 			SpawnEnemy(EnemyType.LINK);
-			SpawnEnemy(EnemyType.LINK);
-			SpawnEnemy(EnemyType.SQUID);
 			SpawnEnemy(EnemyType.SQUID);
 
 			// Spawn the first enemy

@@ -34,9 +34,9 @@ namespace LD31 {
 			background.Scroll = 0;
 			AddGraphic(corners);
 
-			/*credits.X = 290;
-			credits.Y = 800;
-			credits.CenterOrigin();*/
+			credits.X = 250;
+			credits.Y = 960;
+			credits.CenterOrigin();
 			AddGraphic(credits);
 
 			lights.Clear();
@@ -75,6 +75,9 @@ namespace LD31 {
 			if (Input.KeyPressed(Key.Escape)) {
 				Game.Close();
 			}
+
+			credits.Scale = ((Game.WindowFullscreen) ? 1.0f : 2.0f);
+			credits.X = ((Game.WindowFullscreen) ? 250 : 1600);
 
 			foreach (Light light in lights) {
 				light.Update(Game.RealDeltaTime * 0.001f);
