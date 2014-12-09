@@ -44,6 +44,8 @@ namespace LD31 {
 
 		private float bounceTimeout = 0.0f;
 
+		private bool dead = false;
+
 		public Player(float x, float y, Session session) : base(x, y) {
 			// Assign session
 			this.session = session;
@@ -259,12 +261,18 @@ namespace LD31 {
 		}
 
 		IEnumerator Die() {
-			// TODO: Death animation
-			
-			yield return 0;
-			RemoveSelf();
-			Level.lights.Remove(light);
-			((Level)Scene).GameOver();
+			if (!dead) {
+				dead = true;
+				light.FadeOut(1.8f);
+				while (sprite.Alpha > 0.1f) {
+					sprite.Alpha = Util.Lerp(sprite.Alpha, 0.0f, 0.06f);
+					yield return 0;
+				}
+				yield return Coroutine.Instance.WaitForFrames(60);
+				((Level)Scene).GameOver();
+				Level.lights.Remove(light);
+				RemoveSelf();
+			}
 		}
 
 		void Attack() {

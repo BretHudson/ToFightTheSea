@@ -13,7 +13,7 @@ namespace LD31 {
 
 		static void Main(string[] args) {
 			// Create the game
-			game = new Game("LD31 - Team Butts", 1920, 1080, 60, false);
+			game = new Game("To Fight The Sea", 1920, 1080, 60, false);
 			
 			// Screen size
 			game.SetWindowScale(0.5f);

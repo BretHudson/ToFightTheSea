@@ -39,6 +39,8 @@ namespace LD31 {
 			credits.CenterOrigin();*/
 			AddGraphic(credits);
 
+			lights.Clear();
+
 			background.Shader = new Shader(ShaderType.Fragment, "assets/shaders/water_wave.frag");
 
 			ambientLighting = new Surface(1920, 1080);

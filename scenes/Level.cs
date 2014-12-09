@@ -41,6 +41,9 @@ namespace LD31 {
 			lightTextures.Add(lightTexture1);
 
 			lights.Clear();
+			darkness.Clear();
+
+			player = null;
 		}
 
 		public override void Begin() {
@@ -115,7 +118,6 @@ namespace LD31 {
 
 		public override void Update() {
 			if (Input.KeyPressed(Key.Escape)) {
-				player.ApplyDamage(1000);
 				GameOver();
 			}
 
@@ -176,6 +178,8 @@ namespace LD31 {
 		IEnumerator Finish(string name) {
 			if (!finished) {
 				finished = true;
+
+				player.ApplyDamage(1000);
 
 				// Show message
 				Add(new Logo(960, 200, name));
