@@ -3,3 +3,5 @@
 A collaboration between Bret Hudson, Cameron Erickson, and Mike LeRoy for [Ludum Dare #31](http://ludumdare.com/compo/ludum-dare-31/)
 
 This is the source code for our [Ludum Dare #31 entry](http://ludumdare.com/compo/ludum-dare-31/?action=preview&uid=8684).
+
+Note: Download the original game via the link above for the game's assets.
